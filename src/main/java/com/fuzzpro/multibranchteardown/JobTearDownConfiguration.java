@@ -24,12 +24,13 @@
 
 package com.fuzzpro.multibranchteardown;
 
+import java.io.Serializable;
+
 import hudson.Extension;
 import jenkins.model.GlobalConfiguration;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
-import java.io.Serializable;
 
 @Extension
 public class JobTearDownConfiguration extends GlobalConfiguration implements Serializable {

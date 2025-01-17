@@ -1,6 +1,8 @@
 package com.fuzzpro.multibranchteardown;
 
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import java.util.Arrays;
+import java.util.List;
+
 import hudson.model.ParameterValue;
 import hudson.model.ParametersAction;
 import jenkins.branch.BranchProperty;
@@ -8,6 +10,7 @@ import jenkins.branch.BranchSource;
 import jenkins.branch.DefaultBranchPropertyStrategy;
 import jenkins.plugins.git.GitSCMSource;
 import jenkins.plugins.git.GitSampleRepoRule;
+import org.htmlunit.html.HtmlForm;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -20,9 +23,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+
 import static org.junit.Assert.fail;
 
 public class JobTearDownListenerTest {

@@ -24,7 +24,11 @@
 
 package com.fuzzpro.multibranchteardown;
 
-import com.cloudbees.hudson.plugins.folder.Folder;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.logging.Logger;
+
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Cause;
@@ -35,7 +39,6 @@ import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.ParametersAction;
 import hudson.model.StringParameterValue;
-import hudson.model.TopLevelItem;
 import hudson.model.listeners.ItemListener;
 import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.UserRemoteConfig;
@@ -47,19 +50,12 @@ import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.plugins.git.GitSCMSource;
-import jenkins.scm.api.SCMHead;
 import jenkins.scm.api.SCMSource;
-import jenkins.scm.api.mixin.ChangeRequestSCMHead2;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.libs.GlobalLibraries;
 import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration;
 import org.jenkinsci.plugins.workflow.libs.SCMRetriever;
 import org.jenkinsci.plugins.workflow.libs.SCMSourceRetriever;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.logging.Logger;
 
 @Extension
 public class JobTearDownListener extends ItemListener {
@@ -67,7 +63,16 @@ public class JobTearDownListener extends ItemListener {
     static final String LOGGER = JobTearDownListener.class.getSimpleName();
 
     @Override
+    public void onDeleted(Item item) {
+        processDeleted(item);
+    }
+
+    @Override
     public void onUpdated(Item item) {
+        processDeleted(item);
+    }
+
+    public void processDeleted(Item item) {
         Logger.getLogger(LOGGER).fine("Job Class: " + item.getClass().getSimpleName());
         if (canTearDownInfrastructure(item)) {
             Job job = (Job) item;
@@ -100,7 +105,7 @@ public class JobTearDownListener extends ItemListener {
             JobTearDownProperty jtdprop = (JobTearDownProperty) prop;
             Logger.getLogger(LOGGER).fine("Execute tear down on: " + jtdprop.getJobName());
             tearDownJob = Jenkins.get().getItemByFullName(jtdprop.getJobName());
-        }else if (jobName != null && !jobName.trim().isEmpty()) {
+        } else if (jobName != null && !jobName.trim().isEmpty()) {
             Logger.getLogger(LOGGER).fine("Default Job: " + config.getTearDownJob());
             tearDownJob = Jenkins.get().getItemByFullName(jobName);
         } else {
@@ -142,8 +147,8 @@ public class JobTearDownListener extends ItemListener {
         if (item instanceof WorkflowJob) {
             WorkflowJob job = (WorkflowJob) item;
             scms.addAll(job.getSCMs());
-        } else if(item instanceof AbstractProject) {
-            scms.add(((AbstractProject)item).getScm());
+        } else if (item instanceof AbstractProject) {
+            scms.add(((AbstractProject) item).getScm());
         }
 
         ArrayList<String> remoteURLs = new ArrayList<>();

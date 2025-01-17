@@ -24,17 +24,14 @@
 
 package com.fuzzpro.multibranchteardown;
 
+import java.io.Serializable;
+
 import hudson.Extension;
-import hudson.model.Descriptor;
-import hudson.model.DescriptorVisibilityFilter;
-import hudson.model.Job;
-import jenkins.branch.MultiBranchProject;
 import jenkins.model.OptionalJobProperty;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.export.Exported;
-import java.io.Serializable;
 
 public class JobTearDownProperty extends OptionalJobProperty<WorkflowJob> implements Serializable {
 
