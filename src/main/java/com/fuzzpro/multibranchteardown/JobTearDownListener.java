@@ -38,6 +38,10 @@ import hudson.model.listeners.ItemListener;
 import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.UserRemoteConfig;
 import hudson.scm.SCM;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.logging.Logger;
 import jenkins.branch.Branch;
 import jenkins.branch.BranchProjectFactory;
 import jenkins.branch.MultiBranchProject;
@@ -51,11 +55,6 @@ import org.jenkinsci.plugins.workflow.libs.GlobalLibraries;
 import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration;
 import org.jenkinsci.plugins.workflow.libs.SCMRetriever;
 import org.jenkinsci.plugins.workflow.libs.SCMSourceRetriever;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.logging.Logger;
 
 @Extension
 public class JobTearDownListener extends ItemListener {
@@ -79,7 +78,8 @@ public class JobTearDownListener extends ItemListener {
             String branchName = getBranch(item);
             String remoteUrl = getRemote(item);
             ParameterizedJobMixIn.ParameterizedJob tearDownJob = getTearDownJob(job);
-            Logger.getLogger(LOGGER).fine(String.format("Job Info: %s %s %s", item.getFullDisplayName(), branchName, remoteUrl));
+            Logger.getLogger(LOGGER)
+                    .fine(String.format("Job Info: %s %s %s", item.getFullDisplayName(), branchName, remoteUrl));
             if (tearDownJob != null && branchName != null && remoteUrl != null) {
                 Logger.getLogger(LOGGER).fine(String.format("Execute Job: %s %s", branchName, remoteUrl));
                 Cause cause = new Cause.UpstreamCause(job.getLastBuild());
@@ -89,7 +89,7 @@ public class JobTearDownListener extends ItemListener {
                 CauseAction causeAction = new CauseAction(cause);
                 tearDownJob.scheduleBuild2(0, causeAction, paramsAction);
             }
-            //TODO should we allow other project types for tear-down
+            // TODO should we allow other project types for tear-down
         }
     }
 
@@ -105,7 +105,7 @@ public class JobTearDownListener extends ItemListener {
             JobTearDownProperty jtdprop = (JobTearDownProperty) prop;
             Logger.getLogger(LOGGER).fine("Execute tear down on: " + jtdprop.getJobName());
             tearDownJob = Jenkins.get().getItemByFullName(jtdprop.getJobName());
-        }else if (jobName != null && !jobName.trim().isEmpty()) {
+        } else if (jobName != null && !jobName.trim().isEmpty()) {
             Logger.getLogger(LOGGER).fine("Default Job: " + config.getTearDownJob());
             tearDownJob = Jenkins.get().getItemByFullName(jobName);
         } else {
@@ -138,7 +138,7 @@ public class JobTearDownListener extends ItemListener {
                 branchName = branch.getName();
             }
         }
-        //TODO add support for other types of project
+        // TODO add support for other types of project
         return branchName;
     }
 
@@ -147,8 +147,8 @@ public class JobTearDownListener extends ItemListener {
         if (item instanceof WorkflowJob) {
             WorkflowJob job = (WorkflowJob) item;
             scms.addAll(job.getSCMs());
-        } else if(item instanceof AbstractProject) {
-            scms.add(((AbstractProject)item).getScm());
+        } else if (item instanceof AbstractProject) {
+            scms.add(((AbstractProject) item).getScm());
         }
 
         ArrayList<String> remoteURLs = new ArrayList<>();
@@ -180,9 +180,8 @@ public class JobTearDownListener extends ItemListener {
             }
         }
 
-        //TODO handle FolderLibraries
+        // TODO handle FolderLibraries
 
         return remoteURLs.get(0);
     }
-
 }

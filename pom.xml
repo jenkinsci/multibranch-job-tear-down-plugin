@@ -1,122 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>plugin</artifactId>
-        <version>6.2189.v695a_c41f5249</version>
-        <relativePath />
-    </parent>
-    <groupId>com.fuzzpro.jenkins-plugins</groupId>
-    <artifactId>multibranch-job-tear-down</artifactId>
-    <version>1.3-SNAPSHOT</version>
-    <packaging>hpi</packaging>
-    <name>Multibranch Job Tear Down Plugin</name>
-    <url>https://wiki.jenkins.io/display/JENKINS/Multibranch+Job+Tear+Down+Plugin</url>
-    <description>Tear down infrastructure on branch deletion</description>
-    <scm>
-        <developerConnection>scm:git:git@github.com:jenkinsci/multibranch-job-tear-down-plugin.git</developerConnection>
-        <connection>scm:git:https://github.com/jenkinsci/multibranch-job-tear-down-plugin.git</connection>
-        <url>https://github.com/jenkinsci/multibranch-job-tear-down-plugin</url>
-        <tag>HEAD</tag>
-    </scm>
-    <licenses>
-        <license>
-            <name>MIT License</name>
-            <url>https://opensource.org/licenses/MIT</url>
-        </license>
-    </licenses>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jenkins-ci.plugins</groupId>
+    <artifactId>plugin</artifactId>
+    <version>6.2189.v695a_c41f5249</version>
+    <relativePath />
+  </parent>
+  <groupId>com.fuzzpro.jenkins-plugins</groupId>
+  <artifactId>multibranch-job-tear-down</artifactId>
+  <version>1.3-SNAPSHOT</version>
+  <packaging>hpi</packaging>
+  <name>Multibranch Job Tear Down Plugin</name>
+  <description>Tear down infrastructure on branch deletion</description>
+  <url>https://wiki.jenkins.io/display/JENKINS/Multibranch+Job+Tear+Down+Plugin</url>
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://opensource.org/licenses/MIT</url>
+    </license>
+  </licenses>
 
-    <developers>
-        <developer>
-            <id>fuzzcaguilar</id>
-            <name>Cesar Aguilar</name>
-            <email>cesar@fuzz.pro</email>
-            <organization>Fuzz Productions, LLC</organization>
-        </developer>
-    </developers>
-    <contributors>
-    </contributors>
+  <developers>
+    <developer>
+      <id>fuzzcaguilar</id>
+      <name>Cesar Aguilar</name>
+      <email>cesar@fuzz.pro</email>
+      <organization>Fuzz Productions, LLC</organization>
+    </developer>
+  </developers>
+  <contributors />
+  <scm>
+    <connection>scm:git:https://github.com/jenkinsci/multibranch-job-tear-down-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:jenkinsci/multibranch-job-tear-down-plugin.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/jenkinsci/multibranch-job-tear-down-plugin</url>
+  </scm>
 
-    <properties>
-        <jenkins.baseline>2.528</jenkins.baseline>
-        <jenkins.version>2.534</jenkins.version>
-    </properties>
+  <properties>
+    <jenkins.baseline>2.528</jenkins.baseline>
+    <jenkins.version>2.534</jenkins.version>
+    <spotless.check.skip>false</spotless.check.skip>
+  </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-${jenkins.baseline}.x</artifactId>
-                <version>6585.va_085f4d47c41</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
+  <dependencyManagement>
     <dependencies>
-        <dependency>
-            <groupId>io.jenkins.plugins</groupId>
-            <artifactId>pipeline-groovy-lib</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-multibranch</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>git</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci</groupId>
-            <artifactId>annotation-indexer</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-basic-steps</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>scm-api</artifactId>
-            <classifier>tests</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>git</artifactId>
-            <classifier>tests</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
-            <version>4.3.0</version>
-            <scope>test</scope>
-        </dependency>
+      <dependency>
+        <groupId>io.jenkins.tools.bom</groupId>
+        <artifactId>bom-${jenkins.baseline}.x</artifactId>
+        <version>6585.va_085f4d47c41</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
-    
-    <repositories>
-        <repository>
-            <id>repo.jenkins-ci.org</id>
-            <url>https://repo.jenkins-ci.org/public/</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>repo.jenkins-ci.org</id>
-            <url>https://repo.jenkins-ci.org/public/</url>
-        </pluginRepository>
-    </pluginRepositories>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>pipeline-groovy-lib</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci</groupId>
+      <artifactId>annotation-indexer</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>git</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-multibranch</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <version>4.3.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>git</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>scm-api</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-basic-steps</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>repo.jenkins-ci.org</id>
+      <url>https://repo.jenkins-ci.org/public/</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>repo.jenkins-ci.org</id>
+      <url>https://repo.jenkins-ci.org/public/</url>
+    </pluginRepository>
+  </pluginRepositories>
 </project>

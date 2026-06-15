@@ -1,7 +1,12 @@
 package com.fuzzpro.multibranchteardown;
 
+import static org.junit.Assert.fail;
+
 import hudson.model.ParameterValue;
 import hudson.model.ParametersAction;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 import jenkins.branch.BranchProperty;
 import jenkins.branch.BranchSource;
 import jenkins.branch.DefaultBranchPropertyStrategy;
@@ -22,16 +27,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.fail;
-
 public class JobTearDownListenerTest {
-    
-    @Rule public JenkinsRule j = new JenkinsRule();
-    @Rule public GitSampleRepoRule sampleRepo = new GitSampleRepoRule();
+
+    @Rule
+    public JenkinsRule j = new JenkinsRule();
+
+    @Rule
+    public GitSampleRepoRule sampleRepo = new GitSampleRepoRule();
 
     private static final String DEFAULT_JOB = "job-tear-down-executor";
     private static final String PIPELINE_JOB = "my-custom-pipeline-executor";
@@ -40,13 +42,16 @@ public class JobTearDownListenerTest {
     @Before
     public void setUp() throws Exception {
         sampleRepo.init();
-        sampleRepo.write("Jenkinsfile", "echo \"branch=${env.BRANCH_NAME}\"; node {checkout scm; echo readFile('file')}");
+        sampleRepo.write(
+                "Jenkinsfile", "echo \"branch=${env.BRANCH_NAME}\"; node {checkout scm; echo readFile('file')}");
         sampleRepo.write("file", "initial content");
         sampleRepo.git("add", "Jenkinsfile");
         sampleRepo.git("commit", "--all", "--message=flow");
 
         sampleRepo.git("checkout", "-b", "feature");
-        sampleRepo.write("Jenkinsfile", "echo \"branch=${env.BRANCH_NAME}\"; node {checkout scm; echo readFile('file').toUpperCase()}");
+        sampleRepo.write(
+                "Jenkinsfile",
+                "echo \"branch=${env.BRANCH_NAME}\"; node {checkout scm; echo readFile('file').toUpperCase()}");
         sampleRepo.write("file", "subsequent content");
         sampleRepo.git("commit", "--all", "--message=tweaked");
     }
@@ -138,7 +143,10 @@ public class JobTearDownListenerTest {
 
     private WorkflowJob createBasicJob() throws Exception {
         WorkflowMultiBranchProject mp = j.jenkins.createProject(WorkflowMultiBranchProject.class, "p");
-        mp.getSourcesList().add(new BranchSource(new GitSCMSource(null, sampleRepo.toString(), "", "*", "", false), new DefaultBranchPropertyStrategy(new BranchProperty[0])));
+        mp.getSourcesList()
+                .add(new BranchSource(
+                        new GitSCMSource(null, sampleRepo.toString(), "", "*", "", false),
+                        new DefaultBranchPropertyStrategy(new BranchProperty[0])));
         WorkflowJob p = scheduleAndFindBranchProject(mp, "feature");
         p.setDefinition(new CpsFlowDefinition("node { checkout scm }", true));
         return p;
@@ -146,13 +154,14 @@ public class JobTearDownListenerTest {
 
     private WorkflowJob createCustomJob() throws Exception {
         WorkflowMultiBranchProject mp = j.jenkins.createProject(WorkflowMultiBranchProject.class, "p");
-        mp.getSourcesList().add(new BranchSource(new GitSCMSource(null, sampleRepo.toString(), "", "*", "", false), new DefaultBranchPropertyStrategy(new BranchProperty[0])));
+        mp.getSourcesList()
+                .add(new BranchSource(
+                        new GitSCMSource(null, sampleRepo.toString(), "", "*", "", false),
+                        new DefaultBranchPropertyStrategy(new BranchProperty[0])));
         WorkflowJob p = scheduleAndFindBranchProject(mp, "feature");
         p.setDefinition(new CpsFlowDefinition(
-                "properties([branchTearDownExecutor('"+PIPELINE_JOB+"')])\n" +
-                        "node { " +
-                        "checkout scm " +
-                        "}", true));
+                "properties([branchTearDownExecutor('" + PIPELINE_JOB + "')])\n" + "node { " + "checkout scm " + "}",
+                true));
         return p;
     }
 
@@ -180,7 +189,17 @@ public class JobTearDownListenerTest {
     private void addGlobalLibrary() throws Exception {
         j.configRoundtrip();
         GlobalLibraries gl = GlobalLibraries.get();
-        LibraryConfiguration bar = new LibraryConfiguration("bar", new SCMSourceRetriever(new GitSCMSource(null, "https://github.com/fabric8io/jenkins-pipeline-library", "", "origin", "+refs/heads/*:refs/remotes/origin/*", "*", "", true)));
+        LibraryConfiguration bar = new LibraryConfiguration(
+                "bar",
+                new SCMSourceRetriever(new GitSCMSource(
+                        null,
+                        "https://github.com/fabric8io/jenkins-pipeline-library",
+                        "",
+                        "origin",
+                        "+refs/heads/*:refs/remotes/origin/*",
+                        "*",
+                        "",
+                        true)));
         bar.setDefaultVersion("master");
         bar.setImplicit(true);
         bar.setAllowVersionOverride(false);
