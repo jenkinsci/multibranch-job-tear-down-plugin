@@ -42,8 +42,8 @@
   </scm>
 
   <properties>
-    <jenkins.baseline>2.528</jenkins.baseline>
-    <jenkins.version>2.534</jenkins.version>
+    <jenkins.baseline>2.555</jenkins.baseline>
+    <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <spotless.check.skip>false</spotless.check.skip>
     <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
   </properties>
