@@ -24,7 +24,6 @@
 
 package com.fuzzpro.multibranchteardown;
 
-import com.cloudbees.hudson.plugins.folder.Folder;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Cause;
@@ -35,7 +34,6 @@ import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.ParametersAction;
 import hudson.model.StringParameterValue;
-import hudson.model.TopLevelItem;
 import hudson.model.listeners.ItemListener;
 import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.UserRemoteConfig;
@@ -47,9 +45,7 @@ import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.plugins.git.GitSCMSource;
-import jenkins.scm.api.SCMHead;
 import jenkins.scm.api.SCMSource;
-import jenkins.scm.api.mixin.ChangeRequestSCMHead2;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.libs.GlobalLibraries;
 import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration;
@@ -67,7 +63,16 @@ public class JobTearDownListener extends ItemListener {
     static final String LOGGER = JobTearDownListener.class.getSimpleName();
 
     @Override
+    public void onDeleted(Item item) {
+        processDeleted(item);
+    }
+
+    @Override
     public void onUpdated(Item item) {
+        processDeleted(item);
+    }
+
+    private void processDeleted(Item item) {
         Logger.getLogger(LOGGER).fine("Job Class: " + item.getClass().getSimpleName());
         if (canTearDownInfrastructure(item)) {
             Job job = (Job) item;
