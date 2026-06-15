@@ -28,6 +28,10 @@
       <email>cesar@fuzz.pro</email>
       <organization>Fuzz Productions, LLC</organization>
     </developer>
+    <developer>
+      <id>clemstoquart</id>
+      <name>Clement Stoquart</name>
+    </developer>
   </developers>
   <contributors />
   <scm>
@@ -41,6 +45,7 @@
     <jenkins.baseline>2.528</jenkins.baseline>
     <jenkins.version>2.534</jenkins.version>
     <spotless.check.skip>false</spotless.check.skip>
+    <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
   </properties>
 
   <dependencyManagement>

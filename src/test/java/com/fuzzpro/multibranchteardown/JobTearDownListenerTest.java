@@ -1,17 +1,18 @@
 package com.fuzzpro.multibranchteardown;
 
-import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.*;
 
 import hudson.model.ParameterValue;
 import hudson.model.ParametersAction;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 import jenkins.branch.BranchProperty;
 import jenkins.branch.BranchSource;
 import jenkins.branch.DefaultBranchPropertyStrategy;
 import jenkins.plugins.git.GitSCMSource;
 import jenkins.plugins.git.GitSampleRepoRule;
+import jenkins.plugins.git.junit.jupiter.WithGitSampleRepo;
 import org.awaitility.Awaitility;
 import org.htmlunit.html.HtmlForm;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
@@ -21,26 +22,27 @@ import org.jenkinsci.plugins.workflow.libs.GlobalLibraries;
 import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration;
 import org.jenkinsci.plugins.workflow.libs.SCMSourceRetriever;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class JobTearDownListenerTest {
+@WithJenkins
+@WithGitSampleRepo
+class JobTearDownListenerTest {
 
-    @Rule
-    public JenkinsRule j = new JenkinsRule();
-
-    @Rule
-    public GitSampleRepoRule sampleRepo = new GitSampleRepoRule();
+    private JenkinsRule j;
+    private GitSampleRepoRule sampleRepo;
 
     private static final String DEFAULT_JOB = "job-tear-down-executor";
     private static final String PIPELINE_JOB = "my-custom-pipeline-executor";
     private static final String GLOBAL_JOB = "my-custom-global-executor";
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp(GitSampleRepoRule repo, JenkinsRule rule) throws Exception {
+        j = rule;
+        sampleRepo = repo;
+
         sampleRepo.init();
         sampleRepo.write(
                 "Jenkinsfile", "echo \"branch=${env.BRANCH_NAME}\"; node {checkout scm; echo readFile('file')}");
@@ -57,77 +59,77 @@ public class JobTearDownListenerTest {
     }
 
     @Test
-    public void defaultJobConfiguredAndTriggered() throws Exception {
+    void defaultJobConfiguredAndTriggered() throws Exception {
         WorkflowJob tearDownJob = j.jenkins.createProject(WorkflowJob.class, DEFAULT_JOB);
         WorkflowJob p = createBasicJob();
 
-        Assert.assertEquals(tearDownJob.getNextBuildNumber(), 1);
+        assertEquals(1, tearDownJob.getNextBuildNumber());
         j.assertBuildStatusSuccess(p.scheduleBuild2(0));
         p.delete();
-        Assert.assertEquals(tearDownJob.getNextBuildNumber(), 2);
+        Awaitility.await().atMost(Duration.ofSeconds(5)).until(tearDownJob::getNextBuildNumber, equalTo(2));
         verifyParameters(tearDownJob);
     }
 
     @Test
-    public void userDefinedJobTriggered() throws Exception {
+    void userDefinedJobTriggered() throws Exception {
         WorkflowJob tearDownJob = j.jenkins.createProject(WorkflowJob.class, DEFAULT_JOB);
         WorkflowJob customJob = j.jenkins.createProject(WorkflowJob.class, GLOBAL_JOB);
         WorkflowJob p = createBasicJob();
         setConfigSettings();
 
-        Assert.assertEquals(tearDownJob.getNextBuildNumber(), 1);
-        Assert.assertEquals(customJob.getNextBuildNumber(), 1);
+        assertEquals(1, tearDownJob.getNextBuildNumber());
+        assertEquals(1, customJob.getNextBuildNumber());
         j.assertBuildStatusSuccess(p.scheduleBuild2(0));
         p.delete();
-        Assert.assertEquals(tearDownJob.getNextBuildNumber(), 1);
-        Assert.assertEquals(customJob.getNextBuildNumber(), 2);
+        assertEquals(1, tearDownJob.getNextBuildNumber());
+        assertEquals(2, customJob.getNextBuildNumber());
         verifyParameters(customJob);
     }
 
     @Test
-    public void pipelineDefinedJobTriggered() throws Exception {
+    void pipelineDefinedJobTriggered() throws Exception {
         WorkflowJob tearDownJob = j.jenkins.createProject(WorkflowJob.class, DEFAULT_JOB);
         WorkflowJob customJob = j.jenkins.createProject(WorkflowJob.class, PIPELINE_JOB);
         WorkflowJob p = createCustomJob();
 
-        Assert.assertEquals(tearDownJob.getNextBuildNumber(), 1);
-        Assert.assertEquals(customJob.getNextBuildNumber(), 1);
+        assertEquals(1, tearDownJob.getNextBuildNumber());
+        assertEquals(1, customJob.getNextBuildNumber());
         WorkflowRun run = j.assertBuildStatusSuccess(p.scheduleBuild2(0));
         p.delete();
-        Assert.assertEquals(tearDownJob.getNextBuildNumber(), 1);
-        Assert.assertEquals(customJob.getNextBuildNumber(), 2);
+        assertEquals(1, tearDownJob.getNextBuildNumber());
+        assertEquals(2, customJob.getNextBuildNumber());
         verifyParameters(customJob);
     }
 
     @Test
-    public void pipelineDefinedJobTakesPrecedenceOverGlobalSettings() throws Exception {
+    void pipelineDefinedJobTakesPrecedenceOverGlobalSettings() throws Exception {
         WorkflowJob tearDownJob = j.jenkins.createProject(WorkflowJob.class, DEFAULT_JOB);
         WorkflowJob customJob = j.jenkins.createProject(WorkflowJob.class, GLOBAL_JOB);
         WorkflowJob pipelineJob = j.jenkins.createProject(WorkflowJob.class, PIPELINE_JOB);
         WorkflowJob p = createCustomJob();
         setConfigSettings();
 
-        Assert.assertEquals(tearDownJob.getNextBuildNumber(), 1);
-        Assert.assertEquals(customJob.getNextBuildNumber(), 1);
-        Assert.assertEquals(pipelineJob.getNextBuildNumber(), 1);
+        assertEquals(1, tearDownJob.getNextBuildNumber());
+        assertEquals(1, customJob.getNextBuildNumber());
+        assertEquals(1, pipelineJob.getNextBuildNumber());
         j.assertBuildStatusSuccess(p.scheduleBuild2(0));
         p.delete();
-        Assert.assertEquals(tearDownJob.getNextBuildNumber(), 1);
-        Assert.assertEquals(customJob.getNextBuildNumber(), 1);
-        Assert.assertEquals(pipelineJob.getNextBuildNumber(), 2);
+        assertEquals(1, tearDownJob.getNextBuildNumber());
+        assertEquals(1, customJob.getNextBuildNumber());
+        assertEquals(2, pipelineJob.getNextBuildNumber());
         verifyParameters(pipelineJob);
     }
 
     @Test
-    public void teardownIgnoredGlobalSharedLibraries() throws Exception {
+    void teardownIgnoredGlobalSharedLibraries() throws Exception {
         WorkflowJob tearDownJob = j.jenkins.createProject(WorkflowJob.class, DEFAULT_JOB);
         addGlobalLibrary();
         WorkflowJob p = createBasicJob();
 
-        Assert.assertEquals(tearDownJob.getNextBuildNumber(), 1);
+        assertEquals(1, tearDownJob.getNextBuildNumber());
         j.assertBuildStatusSuccess(p.scheduleBuild2(0));
         p.delete();
-        Assert.assertEquals(tearDownJob.getNextBuildNumber(), 2);
+        assertEquals(2, tearDownJob.getNextBuildNumber());
         verifyParameters(tearDownJob);
     }
 
@@ -174,16 +176,18 @@ public class JobTearDownListenerTest {
     private void verifyParameters(WorkflowJob job) {
         waitForLastBuild(job);
         WorkflowRun run = job.getLastBuild();
-        Assert.assertEquals(run.number, 1);
+        assertEquals(1, run.number);
         ParametersAction action = run.getAction(ParametersAction.class);
         List<ParameterValue> params = action.getAllParameters();
-        Assert.assertEquals(params.size(), 2);
-        Assert.assertEquals(params.get(0).getName(), "git_url");
-        Assert.assertFalse(params.get(0).getValue().toString().isEmpty());
-        Assert.assertNotEquals(params.get(0).getValue(), "https://github.com/fabric8io/jenkins-pipeline-library");
-        Assert.assertEquals(params.get(1).getName(), "branch_name");
-        Assert.assertEquals(params.get(0).getValue(), sampleRepo.getRoot().toString());
-        Assert.assertEquals(params.get(1).getValue(), "feature");
+        assertEquals(2, params.size());
+        assertEquals("git_url", params.get(0).getName());
+        assertFalse(params.get(0).getValue().toString().isEmpty());
+        assertNotEquals(
+                "https://github.com/fabric8io/jenkins-pipeline-library",
+                params.get(0).getValue());
+        assertEquals("branch_name", params.get(1).getName());
+        assertEquals(sampleRepo.getRoot().toString(), params.get(0).getValue());
+        assertEquals("feature", params.get(1).getValue());
     }
 
     private void addGlobalLibrary() throws Exception {
@@ -203,7 +207,7 @@ public class JobTearDownListenerTest {
         bar.setDefaultVersion("master");
         bar.setImplicit(true);
         bar.setAllowVersionOverride(false);
-        gl.setLibraries(Arrays.asList(bar));
+        gl.setLibraries(List.of(bar));
     }
 
     private void waitForLastBuild(WorkflowJob job) {
