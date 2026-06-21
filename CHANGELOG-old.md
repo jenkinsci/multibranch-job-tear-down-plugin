@@ -1,6 +1,8 @@
 Changelog
 ===
 
+See [GitHub releases](https://github.com/jenkinsci/multibranch-job-tear-down-plugin/releases) for all newer versions.
+
 ### 1.1
 
 Release date: _Dec 12, 2018_
