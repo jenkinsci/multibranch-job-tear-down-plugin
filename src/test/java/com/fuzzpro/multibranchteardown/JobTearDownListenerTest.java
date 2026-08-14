@@ -180,7 +180,7 @@ class JobTearDownListenerTest {
         ParametersAction action = run.getAction(ParametersAction.class);
         List<ParameterValue> params = action.getAllParameters();
         assertEquals(2, params.size());
-        assertEquals("git_url", params.get(0).getName());
+        assertEquals("git_url", params.getFirst().getName());
         assertFalse(params.get(0).getValue().toString().isEmpty());
         assertNotEquals(
                 "https://github.com/fabric8io/jenkins-pipeline-library",
