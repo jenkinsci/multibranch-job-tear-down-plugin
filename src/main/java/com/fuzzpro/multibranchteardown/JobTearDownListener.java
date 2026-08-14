@@ -101,8 +101,7 @@ public class JobTearDownListener extends ItemListener {
         if (config != null) {
             jobName = config.getTearDownJob();
         }
-        if (prop != null && prop instanceof JobTearDownProperty) {
-            JobTearDownProperty jtdprop = (JobTearDownProperty) prop;
+        if (prop != null && prop instanceof JobTearDownProperty jtdprop) {
             Logger.getLogger(LOGGER).fine("Execute tear down on: " + jtdprop.getJobName());
             tearDownJob = Jenkins.get().getItemByFullName(jtdprop.getJobName());
         } else if (jobName != null && !jobName.trim().isEmpty()) {
@@ -153,9 +152,8 @@ public class JobTearDownListener extends ItemListener {
 
         ArrayList<String> remoteURLs = new ArrayList<>();
         for (SCM scm : scms) {
-            if (scm != null && scm instanceof GitSCM) {
-                GitSCM git = (GitSCM) scm;
-                UserRemoteConfig remote = git.getUserRemoteConfigs().get(0);
+            if (scm != null && scm instanceof GitSCM git) {
+                UserRemoteConfig remote = git.getUserRemoteConfigs().getFirst();
                 Logger.getLogger(LOGGER).fine("SCM URL: " + remote.getUrl());
                 remoteURLs.add(remote.getUrl());
             }
@@ -168,7 +166,7 @@ public class JobTearDownListener extends ItemListener {
                 SCM scm = ((SCMRetriever) library.getRetriever()).getScm();
                 if (scm != null && scm instanceof GitSCM) {
                     GitSCM git = (GitSCM) scm;
-                    UserRemoteConfig remote = git.getUserRemoteConfigs().get(0);
+                    UserRemoteConfig remote = git.getUserRemoteConfigs().getFirst();
                     remoteURLs.remove(remote.getUrl());
                 }
             } else if (library.getRetriever() instanceof SCMSourceRetriever) {
@@ -182,6 +180,6 @@ public class JobTearDownListener extends ItemListener {
 
         // TODO handle FolderLibraries
 
-        return remoteURLs.get(0);
+        return remoteURLs.getFirst();
     }
 }
