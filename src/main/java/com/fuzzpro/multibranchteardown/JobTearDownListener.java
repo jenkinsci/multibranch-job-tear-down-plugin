@@ -73,8 +73,7 @@ public class JobTearDownListener extends ItemListener {
 
     private void processDeleted(Item item) {
         Logger.getLogger(LOGGER).fine("Job Class: " + item.getClass().getSimpleName());
-        if (canTearDownInfrastructure(item)) {
-            Job job = (Job) item;
+        if (canTearDownInfrastructure(item) && item instanceof Job job) {
             String branchName = getBranch(item);
             String remoteUrl = getRemote(item);
             ParameterizedJobMixIn.ParameterizedJob tearDownJob = getTearDownJob(job);
@@ -101,7 +100,7 @@ public class JobTearDownListener extends ItemListener {
         if (config != null) {
             jobName = config.getTearDownJob();
         }
-        if (prop != null && prop instanceof JobTearDownProperty jtdprop) {
+        if (prop instanceof JobTearDownProperty jtdprop) {
             Logger.getLogger(LOGGER).fine("Execute tear down on: " + jtdprop.getJobName());
             tearDownJob = Jenkins.get().getItemByFullName(jtdprop.getJobName());
         } else if (jobName != null && !jobName.trim().isEmpty()) {
@@ -110,28 +109,28 @@ public class JobTearDownListener extends ItemListener {
         } else {
             tearDownJob = Jenkins.get().getItemByFullName("job-tear-down-executor");
         }
-        if (tearDownJob instanceof ParameterizedJobMixIn.ParameterizedJob) {
-            return (ParameterizedJobMixIn.ParameterizedJob) tearDownJob;
+        if (tearDownJob instanceof ParameterizedJobMixIn.ParameterizedJob parameterizedJob) {
+            return parameterizedJob;
         }
         return null;
     }
 
     private boolean canTearDownInfrastructure(Item item) {
         boolean isDisabled = false;
-        if (item instanceof AbstractProject) {
-            isDisabled = ((AbstractProject) item).isDisabled();
-        } else if (item instanceof WorkflowJob) {
-            isDisabled = ((WorkflowJob) item).isDisabled();
+        if (item instanceof AbstractProject abstractProject) {
+            isDisabled = abstractProject.isDisabled();
+        } else if (item instanceof WorkflowJob workflowJob) {
+            isDisabled = workflowJob.isDisabled();
         }
-        return item instanceof Job && isDisabled;
+        return isDisabled;
     }
 
     private String getBranch(Item item) {
         String branchName = null;
         WorkflowJob job = (WorkflowJob) item;
-        ItemGroup parent = item.getParent();
-        if (parent instanceof MultiBranchProject) {
-            BranchProjectFactory projectFactory = ((MultiBranchProject) parent).getProjectFactory();
+        ItemGroup itemParent = item.getParent();
+        if (itemParent instanceof MultiBranchProject parent) {
+            BranchProjectFactory projectFactory = parent.getProjectFactory();
             if (projectFactory.isProject(item)) {
                 Branch branch = projectFactory.getBranch(job);
                 branchName = branch.getName();
@@ -143,16 +142,15 @@ public class JobTearDownListener extends ItemListener {
 
     private String getRemote(Item item) {
         Collection<SCM> scms = new ArrayList<>();
-        if (item instanceof WorkflowJob) {
-            WorkflowJob job = (WorkflowJob) item;
-            scms.addAll(job.getSCMs());
-        } else if (item instanceof AbstractProject) {
-            scms.add(((AbstractProject) item).getScm());
+        if (item instanceof WorkflowJob workflowJob) {
+            scms.addAll(workflowJob.getSCMs());
+        } else if (item instanceof AbstractProject project) {
+            scms.add(project.getScm());
         }
 
-        ArrayList<String> remoteURLs = new ArrayList<>();
+        List<String> remoteURLs = new ArrayList<>();
         for (SCM scm : scms) {
-            if (scm != null && scm instanceof GitSCM git) {
+            if (scm instanceof GitSCM git) {
                 UserRemoteConfig remote = git.getUserRemoteConfigs().getFirst();
                 Logger.getLogger(LOGGER).fine("SCM URL: " + remote.getUrl());
                 remoteURLs.add(remote.getUrl());
@@ -164,15 +162,13 @@ public class JobTearDownListener extends ItemListener {
         for (LibraryConfiguration library : globalLibraries) {
             if (library.getRetriever() instanceof SCMRetriever) {
                 SCM scm = ((SCMRetriever) library.getRetriever()).getScm();
-                if (scm != null && scm instanceof GitSCM) {
-                    GitSCM git = (GitSCM) scm;
+                if (scm instanceof GitSCM git) {
                     UserRemoteConfig remote = git.getUserRemoteConfigs().getFirst();
                     remoteURLs.remove(remote.getUrl());
                 }
             } else if (library.getRetriever() instanceof SCMSourceRetriever) {
                 SCMSource scm = ((SCMSourceRetriever) library.getRetriever()).getScm();
-                if (scm != null && scm instanceof GitSCMSource) {
-                    GitSCMSource git = (GitSCMSource) scm;
+                if (scm instanceof GitSCMSource git) {
                     remoteURLs.remove(git.getRemote());
                 }
             }
