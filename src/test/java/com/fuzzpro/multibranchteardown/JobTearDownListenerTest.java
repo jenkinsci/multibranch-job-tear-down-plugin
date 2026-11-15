@@ -116,8 +116,8 @@ class JobTearDownListenerTest {
         p.delete();
         assertEquals(1, tearDownJob.getNextBuildNumber());
         assertEquals(1, customJob.getNextBuildNumber());
-        assertEquals(2, pipelineJob.getNextBuildNumber());
         verifyParameters(pipelineJob);
+        assertEquals(2, pipelineJob.getNextBuildNumber());
     }
 
     @Test
