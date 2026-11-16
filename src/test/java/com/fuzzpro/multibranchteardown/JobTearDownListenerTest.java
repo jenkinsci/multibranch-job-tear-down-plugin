@@ -129,8 +129,8 @@ class JobTearDownListenerTest {
         assertEquals(1, tearDownJob.getNextBuildNumber());
         j.assertBuildStatusSuccess(p.scheduleBuild2(0));
         p.delete();
-        assertEquals(2, tearDownJob.getNextBuildNumber());
         verifyParameters(tearDownJob);
+        assertEquals(2, tearDownJob.getNextBuildNumber());
     }
 
     private WorkflowJob scheduleAndFindBranchProject(WorkflowMultiBranchProject mp, String name) throws Exception {
